@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 
+	handlers "video-processor/src/infrastructure/handlers"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,7 +15,6 @@ func main() {
 
 	r := gin.Default()
 
-	// CORS simples
 	r.Use(func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
@@ -26,20 +27,16 @@ func main() {
 
 		c.Next()
 	})
-
-	// Static folders for generated content
 	r.Static("/uploads", "./uploads")
 	r.Static("/outputs", "./outputs")
 
-	// Serve HTML landing page
 	r.GET("/", func(c *gin.Context) {
 		c.File("public/index.html")
 	})
 
-	// API routes
-	r.POST("/upload", handleVideoUpload)
-	r.GET("/download/:filename", handleDownload)
-	r.GET("/api/status", handleStatus)
+	r.POST("/upload", handlers.HandleUpload)
+	r.GET("/download/:filename", handlers.HandleDownload)
+	r.GET("/api/status", handlers.HandleStatus)
 
 	fmt.Println("🎬 Servidor iniciado na porta 8080")
 	fmt.Println("📂 Acesse: http://localhost:8080")

@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	handlers "video-processor/src/infrastructure/handlers"
+	handlers "video-processor/internal/infrastructure"
 
 	"github.com/gin-gonic/gin"
 )
@@ -31,7 +31,7 @@ func main() {
 	r.Static("/outputs", "./outputs")
 
 	r.GET("/", func(c *gin.Context) {
-		c.File("public/index.html")
+		c.File("internal/infrastructure/web/templates/index.html")
 	})
 
 	r.POST("/upload", handlers.HandleUpload)
@@ -45,7 +45,7 @@ func main() {
 }
 
 func createDirs() {
-	dirs := []string{"uploads", "outputs", "temp", "public"}
+	dirs := []string{"uploads", "outputs", "temp"}
 	for _, dir := range dirs {
 		os.MkdirAll(dir, 0755)
 	}

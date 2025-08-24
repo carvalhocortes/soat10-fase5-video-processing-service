@@ -10,28 +10,22 @@ import (
 	"strings"
 	"time"
 
+	dto "video-processor/internal/infrastructure/video"
+
 	"github.com/gin-gonic/gin"
 )
-
-type ProcessingResult struct {
-	Success    bool     `json:"success"`
-	Message    string   `json:"message"`
-	ZipPath    string   `json:"zip_path,omitempty"`
-	FrameCount int      `json:"frame_count,omitempty"`
-	Images     []string `json:"images,omitempty"`
-}
 
 // HandleUpload recebe o upload, processa os frames e retorna o ZIP gerado
 func HandleUpload(c *gin.Context) {
 	file, header, err := c.Request.FormFile("video")
 	if err != nil {
-		c.JSON(400, ProcessingResult{Success: false, Message: "Erro ao receber arquivo: " + err.Error()})
+		c.JSON(400, dto.ProcessingResult{Success: false, Message: "Erro ao receber arquivo: " + err.Error()})
 		return
 	}
 	defer file.Close()
 
 	if !isValidVideoFile(header.Filename) {
-		c.JSON(400, ProcessingResult{Success: false, Message: "Formato de arquivo não suportado. Use: mp4, avi, mov, mkv"})
+		c.JSON(400, dto.ProcessingResult{Success: false, Message: "Formato de arquivo não suportado. Use: mp4, avi, mov, mkv"})
 		return
 	}
 
@@ -41,13 +35,13 @@ func HandleUpload(c *gin.Context) {
 
 	out, err := os.Create(videoPath)
 	if err != nil {
-		c.JSON(500, ProcessingResult{Success: false, Message: "Erro ao salvar arquivo: " + err.Error()})
+		c.JSON(500, dto.ProcessingResult{Success: false, Message: "Erro ao salvar arquivo: " + err.Error()})
 		return
 	}
 	defer out.Close()
 
 	if _, err = io.Copy(out, file); err != nil {
-		c.JSON(500, ProcessingResult{Success: false, Message: "Erro ao salvar arquivo: " + err.Error()})
+		c.JSON(500, dto.ProcessingResult{Success: false, Message: "Erro ao salvar arquivo: " + err.Error()})
 		return
 	}
 
@@ -60,7 +54,7 @@ func HandleUpload(c *gin.Context) {
 	c.JSON(200, result)
 }
 
-func processVideo(videoPath, timestamp string) ProcessingResult {
+func processVideo(videoPath, timestamp string) dto.ProcessingResult {
 	tempDir := filepath.Join("temp", timestamp)
 	_ = os.MkdirAll(tempDir, 0755)
 	defer os.RemoveAll(tempDir)
@@ -70,19 +64,19 @@ func processVideo(videoPath, timestamp string) ProcessingResult {
 	cmd := exec.Command("ffmpeg", "-i", videoPath, "-vf", "fps=1", "-y", framePattern)
 
 	if output, err := cmd.CombinedOutput(); err != nil {
-		return ProcessingResult{Success: false, Message: fmt.Sprintf("Erro no ffmpeg: %s\nOutput: %s", err.Error(), string(output))}
+		return dto.ProcessingResult{Success: false, Message: fmt.Sprintf("Erro no ffmpeg: %s\nOutput: %s", err.Error(), string(output))}
 	}
 
 	frames, err := filepath.Glob(filepath.Join(tempDir, "*.png"))
 	if err != nil || len(frames) == 0 {
-		return ProcessingResult{Success: false, Message: "Nenhum frame foi extraído do vídeo"}
+		return dto.ProcessingResult{Success: false, Message: "Nenhum frame foi extraído do vídeo"}
 	}
 
 	zipFilename := fmt.Sprintf("frames_%s.zip", timestamp)
 	zipPath := filepath.Join("outputs", zipFilename)
 
 	if err := createZipFile(frames, zipPath); err != nil {
-		return ProcessingResult{Success: false, Message: "Erro ao criar arquivo ZIP: " + err.Error()}
+		return dto.ProcessingResult{Success: false, Message: "Erro ao criar arquivo ZIP: " + err.Error()}
 	}
 
 	imageNames := make([]string, len(frames))
@@ -90,7 +84,7 @@ func processVideo(videoPath, timestamp string) ProcessingResult {
 		imageNames[i] = filepath.Base(frame)
 	}
 
-	return ProcessingResult{
+	return dto.ProcessingResult{
 		Success:    true,
 		Message:    fmt.Sprintf("Processamento concluído! %d frames extraídos.", len(frames)),
 		ZipPath:    zipFilename,

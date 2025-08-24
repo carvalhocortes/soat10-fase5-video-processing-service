@@ -12,4 +12,4 @@ RUN mkdir -p uploads outputs temp
 
 EXPOSE 8080
 
-CMD ["go", "run", "./src"]
+CMD ["go", "run", "./cmd/server"]

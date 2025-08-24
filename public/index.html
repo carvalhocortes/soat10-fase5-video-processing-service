@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FIAP X - Processador de Vídeos</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎬 FIAP X - Processador de Vídeos</h1>
+      <p style="text-align: center; color: #666">
+        Faça upload de um vídeo e receba um ZIP com todos os frames extraídos!
+      </p>
+
+      <form id="uploadForm" class="upload-form">
+        <p><strong>Selecione um arquivo de vídeo:</strong></p>
+        <input type="file" id="videoFile" accept="video/*" required />
+        <br />
+        <button type="submit">🚀 Processar Vídeo</button>
+      </form>
+
+      <div class="loading" id="loading">
+        <p>⏳ Processando vídeo... Isso pode levar alguns minutos.</p>
+      </div>
+
+      <div class="result" id="result"></div>
+
+      <div class="files-list">
+        <h3>📁 Arquivos Processados:</h3>
+        <div id="filesList">Carregando...</div>
+      </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

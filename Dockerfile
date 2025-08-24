@@ -21,5 +21,5 @@ RUN mkdir -p uploads outputs temp
 # Expor porta
 EXPOSE 8080
 
-# Executar aplicação
-CMD ["go", "run", "main.go"] 
+# Executar aplicação (rodar todo o módulo para incluir todos os arquivos .go)
+CMD ["go", "run", "."]

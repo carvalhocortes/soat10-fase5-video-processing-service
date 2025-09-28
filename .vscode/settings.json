@@ -1,0 +1,10 @@
+{
+  "cSpell.words": [
+    "dynamoose"
+  ],
+  "yaml.schemas": {
+    "file:///Users/samuel/.vscode/extensions/atlassian.atlascode-3.8.18/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml",
+    "file:///Users/samuel/.vscode/extensions/atlassian.atlascode-3.8.6/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml",
+    "https://www.artillery.io/schema.json": []
+  }
+}

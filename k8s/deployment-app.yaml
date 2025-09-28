@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fiap-app-video-processing
+  namespace: default
+  labels:
+    app: fiap-app-video-processing
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fiap-app-video-processing
+  template:
+    metadata:
+      labels:
+        app: fiap-app-video-processing
+    spec:
+      containers:
+        - name: fiap-app-video-processing
+          image: ${IMAGE}
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 128m
+              memory: 256Mi
+            limits:
+              cpu: 256m
+              memory: 512Mi
+          ports:
+            - containerPort: 3333
+          envFrom:
+            - configMapRef:
+                name: fiap-video-processing-config
+            - secretRef:
+                name: fiap-video-processing-secret
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3333
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3333
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3

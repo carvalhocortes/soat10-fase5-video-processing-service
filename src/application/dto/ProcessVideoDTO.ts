@@ -4,11 +4,11 @@ export class ProcessVideoDTO {
     public readonly fileName: string,
     public readonly userId: string,
     public readonly s3Key: string,
-    public readonly uploadStatus: string,
+    public readonly status: string,
   ) {}
 
   static create(data: {
-    payload: { fileId: string; fileName: string; userId: string; s3Key: string; uploadStatus: string };
+    payload: { fileId: string; fileName: string; userId: string; s3Key: string; status: string };
   }): ProcessVideoDTO {
     if (!data.payload.fileId) {
       throw new Error('File ID is required');
@@ -23,7 +23,7 @@ export class ProcessVideoDTO {
       data.payload.fileName,
       data.payload.userId,
       data.payload.s3Key,
-      data.payload.uploadStatus,
+      data.payload.status,
     );
   }
 }

@@ -1,0 +1,35 @@
+name: CI/CD - Pipeline de testes e cobertura
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  tests:
+    name: Rodar testes e cobertura
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Rodar testes
+        run: npm run test
+
+      - name: Checar cobertura
+        run: |
+          COVERAGE=$(npx jest --coverage --coverageReporters=text | grep 'All files' | awk '{print $4}' | sed 's/%//')
+          echo "Cobertura: $COVERAGE%"
+          MIN_COVERAGE=80
+          if (( $(echo "$COVERAGE < $MIN_COVERAGE" | bc -l) )); then
+            echo "Cobertura abaixo do mínimo exigido ($MIN_COVERAGE%)"
+            exit 1
+          fi

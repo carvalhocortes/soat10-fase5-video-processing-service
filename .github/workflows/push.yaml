@@ -1,0 +1,63 @@
+name: CI/CD - Pipeline de Deploy EKS
+
+on:
+  push:
+    branches: [main]
+
+env:
+  AWS_REGION: us-west-2
+  CLUSTER_NAME: eks-fiap-soat10-prod
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  AWS_ECR_NAME: fiap-payments-prod
+  SQS_PAYMENT_QUEUE_URL: ${{ secrets.SQS_PAYMENT_QUEUE_URL }}
+  SNS_PAYMENT_TOPIC_ARN: ${{ secrets.SNS_PAYMENT_TOPIC_ARN }}
+
+jobs:
+  deploy:
+    name: Deploy EKS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login ECR
+        run: |
+          aws ecr get-login-password \
+          --region ${{ env.AWS_REGION }} | \
+          docker login --username AWS \
+          --password-stdin \
+          ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+
+      - name: BuildAndPush Dockerfile
+        run: |
+          docker build -t ${{ env.AWS_ECR_NAME }} . && \
+          docker tag ${{ env.AWS_ECR_NAME }}:latest ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_NAME }}:latest && \
+          docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_NAME }}:latest
+
+      - name: Update Kube Config
+        run: |
+          aws eks update-kubeconfig \
+          --name ${{ env.CLUSTER_NAME }} \
+          --region ${{ env.AWS_REGION }}
+
+      - name: Kube Apply
+        env:
+          IMAGE: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_NAME }}:latest
+        run: |
+          envsubst < k8s/configmap.yaml
+          envsubst < k8s/configmap.yaml | kubectl apply -f -
+          export BASE64_ACCESS_KEY_ID=$(echo -n "${{ secrets.AWS_ACCESS_KEY_ID }}" | base64 -w 0)
+          export BASE64_SECRET_ACCESS_KEY=$(echo -n "${{ secrets.AWS_SECRET_ACCESS_KEY }}" | base64 -w 0)
+          export BASE64_SESSION_TOKEN=$(echo -n "${{ secrets.AWS_SESSION_TOKEN }}" | base64 -w 0)
+          envsubst < k8s/secret.yaml
+          envsubst < k8s/secret.yaml | kubectl apply -f -
+          envsubst < k8s/deployment-app.yaml | kubectl apply -f -
+          kubectl apply -f k8s/service.yaml
+          kubectl apply -f k8s/hpa.yaml

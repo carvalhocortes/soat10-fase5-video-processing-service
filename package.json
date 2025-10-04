@@ -1,0 +1,65 @@
+{
+  "name": "soat10-video-processing",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "rm -rf dist && tsc && tsc-alias",
+    "dev": "nodemon -r src/index.ts",
+    "start": "node -r tsconfig-paths/register dist/index.js",
+    "prepare": "husky install",
+    "lint": "eslint 'src/**/*.{ts,tsx}' --fix",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "preview-docs": "npx redocly preview",
+    "build-docs": "npx redocly build-docs docs/openapi.yml"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.812.0",
+    "@aws-sdk/client-s3": "^3.896.0",
+    "@aws-sdk/client-sns": "^3.848.0",
+    "@aws-sdk/client-sqs": "^3.854.0",
+    "@aws-sdk/lib-dynamodb": "^3.812.0",
+    "@types/archiver": "^6.0.3",
+    "@types/fluent-ffmpeg": "^2.1.27",
+    "@types/node": "^22.10.5",
+    "archiver": "^7.0.1",
+    "aws-sdk": "^2.1692.0",
+    "dynamoose": "^4.0.4",
+    "express": "^4.21.2",
+    "fluent-ffmpeg": "^2.1.3",
+    "uuid": "^11.0.5",
+    "yup": "^1.6.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "@redocly/cli": "^1.27.2",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/uuid": "^10.0.0",
+    "dotenv": "^16.4.7",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.14.0",
+    "husky": "^8.0.0",
+    "jest": "^30.0.5",
+    "lint-staged": "^15.3.0",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.4.2",
+    "ts-jest": "^29.4.0",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "git add"
+    ]
+  }
+}

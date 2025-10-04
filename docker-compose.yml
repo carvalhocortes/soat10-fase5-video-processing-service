@@ -1,0 +1,12 @@
+services:
+  app:
+    container_name: fiap-app-video-processing
+    build: ./
+    ports:
+      - '3333:3333'
+    networks:
+      - fiap-network
+
+networks:
+  fiap-network:
+    driver: bridge

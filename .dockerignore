@@ -1,0 +1,12 @@
+.dockerignore
+.editorconfig
+.env.example
+.gitignore
+docker-compose.yml
+Dockerfile
+eslint.config.mjs
+yarn.lock
+.husky/
+.git/
+readme.md
+.prettierrc

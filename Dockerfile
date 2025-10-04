@@ -1,15 +1,21 @@
-FROM golang:1.21-alpine
+FROM node:latest
 
-RUN apk add --no-cache ffmpeg
+WORKDIR /dist
 
-WORKDIR /app
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY package*.json ./
+
+RUN npm install
 
 COPY . .
 
-RUN go mod tidy
+RUN npm run build
 
-RUN mkdir -p uploads outputs temp
+RUN rm -rf src
 
-EXPOSE 8080
+EXPOSE 3333
 
-CMD ["go", "run", "./cmd/server"]
+CMD ["node", "dist/index.js"]

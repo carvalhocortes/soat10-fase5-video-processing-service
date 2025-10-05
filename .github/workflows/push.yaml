@@ -6,9 +6,9 @@ on:
 
 env:
   AWS_REGION: us-west-2
-  CLUSTER_NAME: eks-fiap-soat10-prod
+  CLUSTER_NAME: eks-fiap-soat10
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  AWS_ECR_NAME: fiap-payments-prod
+  AWS_ECR_NAME: file-processing-api
   SQS_PAYMENT_QUEUE_URL: ${{ secrets.SQS_PAYMENT_QUEUE_URL }}
   SNS_PAYMENT_TOPIC_ARN: ${{ secrets.SNS_PAYMENT_TOPIC_ARN }}
 

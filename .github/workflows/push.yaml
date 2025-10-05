@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 env:
-  AWS_REGION: us-west-2
+  AWS_REGION: ${{ secrets.AWS_REGION }}
   CLUSTER_NAME: eks-fiap-soat10
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   AWS_ECR_NAME: file-processing-api
@@ -31,26 +31,26 @@ jobs:
       - name: Login ECR
         run: |
           aws ecr get-login-password \
-          --region ${{ env.AWS_REGION }} | \
+          --region us-west-2 | \
           docker login --username AWS \
           --password-stdin \
-          ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+          381492156649.dkr.ecr.us-west-2.amazonaws.com
 
       - name: BuildAndPush Dockerfile
         run: |
-          docker build -t ${{ env.AWS_ECR_NAME }} . && \
-          docker tag ${{ env.AWS_ECR_NAME }}:latest ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_NAME }}:latest && \
-          docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_NAME }}:latest
+          docker build -t file-processing-api . && \
+          docker tag file-processing-api:latest 381492156649.dkr.ecr.us-west-2.amazonaws.com/file-processing-api:latest && \
+          docker push 381492156649.dkr.ecr.us-west-2.amazonaws.com/file-processing-api:latest
 
       - name: Update Kube Config
         run: |
           aws eks update-kubeconfig \
-          --name ${{ env.CLUSTER_NAME }} \
-          --region ${{ env.AWS_REGION }}
+          --name eks-fiap-soat10 \
+          --region us-west-2
 
       - name: Kube Apply
         env:
-          IMAGE: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_NAME }}:latest
+          IMAGE: 381492156649.dkr.ecr.us-west-2.amazonaws.com/file-processing-api:latest
         run: |
           envsubst < k8s/configmap.yaml
           envsubst < k8s/configmap.yaml | kubectl apply -f -

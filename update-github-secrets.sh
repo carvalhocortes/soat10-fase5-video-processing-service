@@ -8,5 +8,6 @@ gh secret set TF_VAR_aws_region -b"$AWS_REGION"
 export TF_VAR_aws_region="$AWS_REGION"
 gh secret set AWS_REGION -b"$AWS_REGION"
 
+gh secret set AWS_ACCOUNT_ID -b"$AWS_ACCOUNT_ID"
 gh secret set TF_VAR_AWS_ACCOUNT_ID -b"$AWS_ACCOUNT_ID"
 export TF_VAR_AWS_ACCOUNT_ID="$AWS_ACCOUNT_ID"

@@ -31,10 +31,10 @@ jobs:
       - name: Login ECR
         run: |
           aws ecr get-login-password \
-          --region us-west-2 | \
+          --region ${{ env.AWS_REGION }} | \
           docker login --username AWS \
           --password-stdin \
-          381492156649.dkr.ecr.us-west-2.amazonaws.com
+          ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
 
       - name: BuildAndPush Dockerfile
         run: |
